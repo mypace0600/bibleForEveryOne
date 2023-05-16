@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/bible?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password:
+  mybatis:
+    config-location: classpath:MybatisConfig.xml
+    mapper-locations: classpath:mappers/**/*.xml
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
