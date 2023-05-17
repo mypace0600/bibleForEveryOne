@@ -1,16 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-</head>
-<body>
+
+<%@include file="layout/header.jsp"%>
 <c:forEach items="${bookNameList}" var="bookData">
-    <div>
-        <span class="bookName" id="${bookData.bookNum}">${bookData.bookName}</span>
+    <div class="bookName" id="${bookData.bookNum}">
+        <span>${bookData.bookName}</span>
+        <c:forEach items="${bookData.chapterNumberList}" var="chapterNum">
+            <span>${chapterNum}</span>
+        </c:forEach>
+
     </div>
 </c:forEach>
-<scrpit src="/js/search.js"></scrpit>
-</body>
-</html>
+<script src="/js/search.js"></script>
+<%@include file="layout/footer.jsp"%>

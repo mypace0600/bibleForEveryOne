@@ -15,28 +15,33 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import static com.best.bible.global.GlobalUse.getBookData;
 
 @Slf4j
-@RequiredArgsConstructor
 @Controller
+@RequiredArgsConstructor
 public class JsonReaderController {
 
     @GetMapping("/")
     public String getBibleDataListByBookAndChapter(Integer bookNum, Integer chapterNum, Model model) throws IOException {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<BibleContentData> bibleContentDataList = new ArrayList<>();
-        if(bookNum==null){
+        if(bookNum == null){
             bookNum = 1;
         }
+        BookData bookData = getBookData(bookNum);
+
         if(chapterNum == null){
             chapterNum = 0;
         }
-        BookData bookData = getBookData(bookNum, objectMapper);
         ChapterData chapterData = bookData.getChapters().get(chapterNum);
+
+        List<BibleContentData> bibleContentDataList = new ArrayList<>();
         for (VerseData verse : chapterData.getVerses()) {
             BibleContentData bibleData = BibleContentData.builder()
                     .bookNum(TitleData.valueOf(bookData.getBook()).getNumber())
@@ -47,34 +52,19 @@ public class JsonReaderController {
                     .build();
             bibleContentDataList.add(bibleData);
         }
+
         String bookName = bookData.getBook();
         model.addAttribute("bookName",bookName);
         model.addAttribute("chapterNum",chapterNum+1);
         model.addAttribute("bibleContentDataList",bibleContentDataList);
+
         return "index";
     }
 
-    private static BookData getBookData(int bookNum, ObjectMapper objectMapper) throws IOException {
 
-        String bookName = getBookNameByBookNum(bookNum);
 
-        String jsonFileName = "bible/"+ bookName + ".json";
-        ClassPathResource resource = new ClassPathResource(jsonFileName);
-        Path path = Paths.get(resource.getURI());
-        File jsonFile = new File(path.toString());
-        BookData bookData = objectMapper.readValue(jsonFile, BookData.class);
-        return bookData;
-    }
-
-    private static String getBookNameByBookNum(int bookNum) {
-        String bookName = Arrays.stream(TitleData.values())
-                .filter(title -> title.getNumber() == bookNum)
-                .findFirst().orElseThrow(()->new IllegalArgumentException("해당 성경이 없습니다.")).getName();
-        return bookName;
-    }
-
-    @GetMapping("/selectBookName")
-    public String selectBookName(Model model) {
+    @GetMapping("/select/book")
+    public String selectBookName(Model model) throws IOException {
 
         List<Box> bookDataList = new ArrayList<>();
 
@@ -82,6 +72,14 @@ public class JsonReaderController {
             Box box = new Box();
             box.put("bookName",data.getName());
             box.put("bookNum",data.getNumber());
+            int bookNum = data.getNumber();
+
+            BookData bookData = getBookData(bookNum);
+            List<Integer> chapterNumberList = new ArrayList<>();
+            for(ChapterData chapterData: bookData.getChapters()){
+                chapterNumberList.add(chapterData.getChapter());
+            }
+            box.put("chapterNumberList",chapterNumberList);
             bookDataList.add(box);
         }
 
@@ -90,20 +88,20 @@ public class JsonReaderController {
         return "selectBookName";
     }
 
-    @GetMapping("/selectChapterNumber")
-    public String selectChapterNumber(Model model,int bookNum) throws IOException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        BookData bookData = getBookData(bookNum,objectMapper);
+    @GetMapping("/select/book/{bookNum}")
+    public String selectChapterNumber(@PathVariable String bookNum, Model model) throws IOException {
+        BookData bookData = getBookData(Integer.parseInt(bookNum));
 
         List<Integer> chapterNumberList = new ArrayList<>();
         for(ChapterData chapterData: bookData.getChapters()){
-            chapterNumberList.add(chapterData.getChapter()+1);
+            chapterNumberList.add(chapterData.getChapter());
         }
 
+        model.addAttribute("bookName",bookData.getBook());
         model.addAttribute("chapterNumberList",chapterNumberList);
 
         return "selectChapterNumber";
     }
+
 
 }
