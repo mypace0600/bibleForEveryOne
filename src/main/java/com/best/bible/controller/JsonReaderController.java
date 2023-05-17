@@ -73,4 +73,37 @@ public class JsonReaderController {
         return bookName;
     }
 
+    @GetMapping("/selectBookName")
+    public String selectBookName(Model model) {
+
+        List<Box> bookDataList = new ArrayList<>();
+
+        for(TitleData data : TitleData.values()){
+            Box box = new Box();
+            box.put("bookName",data.getName());
+            box.put("bookNum",data.getNumber());
+            bookDataList.add(box);
+        }
+
+        model.addAttribute("bookNameList",bookDataList);
+
+        return "selectBookName";
+    }
+
+    @GetMapping("/selectChapterNumber")
+    public String selectChapterNumber(Model model,int bookNum) throws IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        BookData bookData = getBookData(bookNum,objectMapper);
+
+        List<Integer> chapterNumberList = new ArrayList<>();
+        for(ChapterData chapterData: bookData.getChapters()){
+            chapterNumberList.add(chapterData.getChapter()+1);
+        }
+
+        model.addAttribute("chapterNumberList",chapterNumberList);
+
+        return "selectChapterNumber";
+    }
+
 }
