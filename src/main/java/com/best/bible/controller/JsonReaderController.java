@@ -7,36 +7,32 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Controller;
 
 @Slf4j
 @RequiredArgsConstructor
+@Controller
 public class JsonReaderController {
 
+    public static void main(String[] args) throws IOException {
 
-    public static void main(String[] args) {
         ObjectMapper objectMapper = new ObjectMapper();
+        List<BibleContentData> bibleDataList = new ArrayList<>();
 
-        SqlSession mySqlSession = null;
-        try {
-            SqlSessionFactory sqlSessionFactory = MySqlMapClient.getSqlSession();
-            mySqlSession = sqlSessionFactory.openSession();
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-
-        try {
-            /*File jsonFile = new File(path);*/
-            File jsonFile = new File("C:\\workspace\\bibleForEveryOne\\src\\main\\resources\\revelation.json");
-            BookData bookData = objectMapper.readValue(jsonFile, BookData.class);
-            List<BibleData> bibleDataList = new ArrayList<>();
+        for(TitleData data : TitleData.values()){
+            String bookName = data.getName();
+            log.debug("@@@@@@@@@@@@@ bookName :{}",bookName);
+            BookData bookData = getBookData(bookName, objectMapper);
             for (ChapterData chapter : bookData.getChapters()) {
                 for (VerseData verse : chapter.getVerses()) {
-                    BibleData bibleData = BibleData.builder()
+                    BibleContentData bibleData = BibleContentData.builder()
                             .bookNum(TitleData.valueOf(bookData.getBook()).getNumber())
                             .book(bookData.getBook())
                             .chapter(chapter.getChapter())
@@ -44,13 +40,19 @@ public class JsonReaderController {
                             .text(verse.getText())
                             .build();
                     bibleDataList.add(bibleData);
-                    mySqlSession.insert("MySql.insertBible",bibleData);
-                    mySqlSession.flushStatements();
-                    mySqlSession.commit();
+                    log.debug("@@@@@@@@ bibleData :{}",bibleData.toString());
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
+
+    private static BookData getBookData(String bookName, ObjectMapper objectMapper) throws IOException {
+        String jsonFileName = TitleData.valueOf(bookName).getName() + ".json";
+        ClassPathResource resource = new ClassPathResource("bible/"+jsonFileName);
+        Path path = Paths.get(resource.getURI());
+        File jsonFile = new File(path.toString());
+        BookData bookData = objectMapper.readValue(jsonFile, BookData.class);
+        return bookData;
+    }
+
 }

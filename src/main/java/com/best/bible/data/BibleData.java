@@ -10,9 +10,5 @@ import java.util.List;
 @ToString
 @Builder
 public class BibleData {
-    private int bookNum;
-    private String book;
-    private int chapter;
-    private int verse;
-    private String text;
+    private List<BookData> books;
 }

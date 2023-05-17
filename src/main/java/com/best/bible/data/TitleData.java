@@ -83,4 +83,5 @@ public enum TitleData {
     public String getName() {
         return name;
     }
+
 }
