@@ -3,16 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.best.bible.mappers.BibleMapper">
+<mapper namespace="MySql">
 
-    <resultMap id="BookResultMap" type="com.example.model.Book">
-        <id property="id" column="id" />
-        <result property="title" column="title" />
-        <result property="author" column="author" />
-        <!-- 추가적인 매핑 설정 -->
-    </resultMap>
-
-    <insert id="insertBook">
+    <insert id="insertBible" parameterType="com.best.bible.data.BibleData">
         INSERT INTO TB_BIBLE_TEXT (bookNum,book,chapter,verse,text)
         VALUES (#{bookNum},#{book},#{chapter},#{verse},#{text});
     </insert>

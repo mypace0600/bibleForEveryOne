@@ -12,7 +12,7 @@ public class MySqlMapClient {
 
     static {
         try {
-            String resource = "mybatis/MyBatisConfig.xml";
+            String resource = "mybatis/MybatisConfig.xml";
             Reader reader = Resources.getResourceAsReader(resource);
             sqlSession = new SqlSessionFactoryBuilder().build(reader);
         } catch (IOException e) {

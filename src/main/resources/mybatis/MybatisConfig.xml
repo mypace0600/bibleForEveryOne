@@ -14,7 +14,7 @@
 
     <!-- 별명 -->
     <typeAliases>
-        <typeAlias alias="box" type="data.Box" />
+        <typeAlias alias="box" type="com.best.bible.data.Box" />
     </typeAliases>
     <!-- db 연결 -->
     <environments default="op">
