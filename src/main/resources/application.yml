@@ -1,4 +1,18 @@
+server:
+  port: 8000
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
 spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
   datasource:
     url: jdbc:mysql://localhost:3306/bible?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
     username: root
@@ -6,7 +20,3 @@ spring:
   mybatis:
     config-location: classpath:MybatisConfig.xml
     mapper-locations: classpath:mappers/**/*.xml
-  mvc:
-    view:
-      prefix: /WEB-INF/views/
-      suffix: .jsp
